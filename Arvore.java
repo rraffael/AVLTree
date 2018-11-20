@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ArvoreAVL;
+package AVLTree;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -26,9 +26,6 @@ import java.util.LinkedList;
     }
     
     //na inserção/remoção checar o peso do nó, se tiver no intervalo 0, apenas insere/remove, senao, faz o balanceamento
-    
-    
-    
     public V inserir(K chave, V valor){
     if(valor!= null){
         if(this.raiz == null){
@@ -69,40 +66,6 @@ import java.util.LinkedList;
             inserirNoPriv(chave, valor, no.direito);
         }
         return null;
-    }
-    
-    
-    public No<K, V> buscarNo(K chave){
-         if(this.raiz == null){
-             return null;
-         }
-         return buscarNoPriv(this.raiz, chave);
-     }
-    
-    private No<K, V> buscarNoPriv(No<K, V> no, K chave){
-        if(no.getChave().compareTo(chave) == 0){
-            return no;
-        }
-        if(no.getChave().compareTo(chave) > 0){
-            if(no.esquerdo != null){
-                return buscarNoPriv(no.esquerdo, chave);
-            }
-        }
-        if(no.getChave().compareTo(chave) < 0){
-            if(no.direito != null){
-                return buscarNoPriv(no.direito, chave);
-            }
-        }
-        return null;
-    }
-    
-    public void limpar(){
-        this.raiz = null;
-        this.tamanhoArvore = 0;
-    }
-    
-    public int tamanho(){
-        return this.tamanhoArvore;
     }
     
     public K remover(K chave){
@@ -214,6 +177,40 @@ import java.util.LinkedList;
         this.percorrerLargura();
     }
     
+    public No<K, V> buscarNo(K chave){
+         if(this.raiz == null){
+             return null;
+         }
+         return buscarNoPriv(this.raiz, chave);
+     }
+    
+    private No<K, V> buscarNoPriv(No<K, V> no, K chave){
+        if(no.getChave().compareTo(chave) == 0){
+            return no;
+        }
+        if(no.getChave().compareTo(chave) > 0){
+            if(no.esquerdo != null){
+                return buscarNoPriv(no.esquerdo, chave);
+            }
+        }
+        if(no.getChave().compareTo(chave) < 0){
+            if(no.direito != null){
+                return buscarNoPriv(no.direito, chave);
+            }
+        }
+        return null;
+    }
+    
+    public void limpar(){
+        this.raiz = null;
+        this.tamanhoArvore = 0;
+    }
+    
+    public int tamanho(){
+        return this.tamanhoArvore;
+    }
+    
+    
     private void percorrerSimetrico(No<K, V> no){
         if(no != null){
             percorrerSimetrico(no.esquerdo);
@@ -239,12 +236,6 @@ import java.util.LinkedList;
         }
     }
     
-    //private fila/lista percorrerLargura
-    //fila.adicionar, arvore.getRaiz;
-    //while(filanaovazia)
-    //ex: remove 22, printa, adiciona os filhos dele, e parte para proximo elemento da fila
-    //checa primeiro esquerda depois direito depois repete o while.
-    //remove 1 elemento, adiciona esquerdo, direito e printa o no removido.
     private void percorrerLargura(){
             
         LinkedList<No> lista = new LinkedList<>();
@@ -261,8 +252,6 @@ import java.util.LinkedList;
         }
         System.out.println("FIM");
     }
-    
-    
     
     @Override
     public Iterator<V> iterator() {

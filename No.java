@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ArvoreAVL;
+package AVLTree;
 
 /**
  *
@@ -14,7 +14,7 @@ public class No<K extends Comparable<K>, V> {
     No<K, V> pai, esquerdo, direito;
     K chave;
     V valor;
-    int peso;
+    private int peso;
     public No(K chave, V valor, No<K, V> pai){
         this.pai = pai;
         this.chave = chave;
