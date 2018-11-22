@@ -22,7 +22,7 @@ public class No<K extends Comparable<K>, V> {
         this.peso = 0;
     }
     
-    public int getPeso(){
+    public int calcularPeso(){
         if(this.peso != 0){
             this.peso = 0;
         }
@@ -38,22 +38,26 @@ public class No<K extends Comparable<K>, V> {
         return peso;
     }
     
+    public int getPeso(){
+        return this.peso;
+    }
+    
     private void percorrerEsquerda(No<K, V> no){
         peso++;
-        if(this.esquerdo != null){
+        if(no.esquerdo != null){
             this.percorrerEsquerda(no.esquerdo);            
         }
-        if(this.direito != null){
+        if(no.direito != null){
             this.percorrerEsquerda(no.direito);
         }
     }
     
     private void percorrerDireito(No<K, V> no){
         peso--;
-        if(this.esquerdo != null){
+        if(no.esquerdo != null){
             this.percorrerDireito(no.esquerdo);            
         }
-        if(this.direito != null){
+        if(no.direito != null){
             this.percorrerDireito(no.direito);
         }
     }

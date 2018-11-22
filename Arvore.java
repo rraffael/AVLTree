@@ -18,28 +18,37 @@ import java.util.LinkedList;
     
     No<K, V> raiz;
     int tamanhoArvore;
+    No<K, V> pivo;
     //No<K, V> vetor[] = new No<K, V>[];
     
     public Arvore(){ 
         this.raiz = null;
         this.tamanhoArvore = 0;
+        this.pivo = null;
     }
     
     //na inserção/remoção checar o peso do nó, se tiver no intervalo 0, apenas insere/remove, senao, faz o balanceamento
     public V inserir(K chave, V valor){
-    if(valor!= null){
-        if(this.raiz == null){
-            this.raiz = new No<>(chave, valor, null);
-            this.tamanhoArvore++;
+        if(valor!= null){
+            if(this.raiz == null){
+                this.raiz = new No<>(chave, valor, null);
+                this.tamanhoArvore++;
+                return valor;
+            }
+            this.calcularPesosNos(this.raiz);
+            this.inserirNoPriv(chave, valor, this.raiz);
+            this.balancearArvore(this.pivo);
+            this.pivo = null;
             return valor;
         }
-        this.inserirNoPriv(chave, valor, this.raiz);
-        return valor;
-    }
         return null;
     }
+    
     //Insere um novo no
     private No<K, V> inserirNoPriv(K chave, V valor, No<K, V> no){
+        if(no.calcularPeso()!= 0){
+            this.pivo = no;
+        }
         //Se o numero já estiver presente na árvore, retornará nulo
         if(no.getChave().compareTo(chave) == 0){
             return null;
@@ -68,84 +77,157 @@ import java.util.LinkedList;
         return null;
     }
     
+    private void balancearArvore(No<K, V> no){
+        if(no != null){
+            int oldPeso = no.getPeso();
+            //rotacao esquerda
+            if(oldPeso < no.calcularPeso()){
+                oldPeso = no.esquerdo.getPeso();
+                //rotacao esquerda-direita
+                if(oldPeso > no.esquerdo.calcularPeso()){
+                    this.rotacionarParaEsquerda(no.esquerdo);
+                }
+                this.rotacionarParaDireita(no);
+            }
+            //rotacao direita
+            if(oldPeso > no.calcularPeso()){
+                oldPeso = no.direito.getPeso();
+                //rotacao direita-esquerda
+                if(oldPeso < no.direito.calcularPeso()){
+                    this.rotacionarParaDireita(no.direito);
+                }
+                this.rotacionarParaEsquerda(no);
+
+            }
+        }
+    }
+    
+    //
+    private void rotacionarParaDireita(No<K, V> no){
+        if(no == this.raiz){
+            no.esquerdo.pai = null;
+            this.raiz = no.esquerdo;
+        }else{
+            no.esquerdo.pai = no.pai;
+        }
+        no.pai = no.esquerdo;
+        if(no.esquerdo.direito != null){
+            no.esquerdo = no.esquerdo.direito;
+            no.esquerdo.pai = no;
+        }else{
+            no.esquerdo = null;
+        }
+        no.pai.direito = no;
+        if(no.pai != this.raiz){
+            no.pai.pai.esquerdo = no.pai;
+        }
+        
+    }
+    
+    //
+    private void rotacionarParaEsquerda(No<K, V> no){
+        if(no == this.raiz){
+            no.direito.pai = null;
+            this.raiz = no.direito;
+        }else{
+            no.direito.pai = no.pai;
+        }
+        no.pai = no.direito;
+        if(no.direito.esquerdo != null){
+            no.direito = no.direito.esquerdo;
+            no.direito.pai = no;
+        }else{
+            no.direito = null;
+        }
+        no.pai.esquerdo = no;
+        if(no.pai != this.raiz){
+            no.pai.pai.direito = no.pai;
+        }
+    }
+    
+    private void calcularPesosNos(No<K, V> no){
+        if(no != null){
+            no.calcularPeso();
+            this.calcularPesosNos(no.esquerdo);
+            this.calcularPesosNos(no.direito);
+        }
+        
+    }
+    //PROBLEMA EM REMOVER
     public K remover(K chave){
         if(this.raiz == null || chave == null){
             return null;
         }
-        No<K, V> no = removerNoPriv(chave, this.raiz);
-        if(no != null){
-        this.tamanhoArvore--;
+        if(this.raiz.getChave() == chave){
+            this.limpar();
+            return chave;
         }
+        removerNoPriv(chave, this.raiz);
+        this.tamanhoArvore--;
+        
         return chave;
        
     }
 
-    private No<K, V> removerNoPriv(K chave, No<K, V> no){
+    private void removerNoPriv(K chave, No<K, V> no){
         if(no.getChave().compareTo(chave) == 0){
             //Caso 1, no folha
             if(no.esquerdo == null && no.direito == null){
-                if(no.pai != null){
-                    if(no.pai.esquerdo == no){
-                    no.pai.esquerdo = null;
-                    return no;
-                    }
-                    if(no.pai.direito == no){
-                    no.pai.direito = null;
-                    return no;
-                    }
-                }else{
-                    this.limpar();
-                    return null;
+                if(no.pai.esquerdo == no){
+                no.pai.esquerdo = null;
+
+                }
+                if(no.pai.direito == no){
+                no.pai.direito = null;
+
                 }
             }
             //Fim caso 1
             
             //Caso 2, subarvore
             if(no.direito != null && no.esquerdo == null){
-                if(no.pai != null){
-                    no.direito.pai = no.pai;
-                    if(no.pai.esquerdo == no){
-                    no.pai.esquerdo = no.direito;
-                    return no;
-                    }
-                    if(no.pai.direito == no){
-                    no.pai.direito = no.direito;
-                    return no;
-                    }
-                }else{
-                    this.raiz = no.direito;
-                    return no;
+                no.direito.pai = no.pai;
+                if(no.pai.esquerdo == no){
+                no.pai.esquerdo = no.direito;
+                }
+                if(no.pai.direito == no){
+                no.pai.direito = no.direito;
                 }
             }
             if(no.esquerdo != null && no.direito == null){
-                if(no.pai != null){
-                    no.esquerdo.pai = no.pai;
-                    if(no.pai.esquerdo == no){
-                    no.pai.esquerdo = no.esquerdo;
-                    return no;
-                    }
-                    if(no.pai.direito == no){
-                    no.pai.direito = no.esquerdo;
-                    return no;
-                    }
-                }else{
-                    this.raiz = no.esquerdo;
-                    return no;
+                no.esquerdo.pai = no.pai;
+                if(no.pai.esquerdo == no){
+                no.pai.esquerdo = no.esquerdo;
+
                 }
+                if(no.pai.direito == no){
+                no.pai.direito = no.esquerdo;
+                }
+ //               this.calcularPesosNos(this.raiz);
+//                no = no.pai;
+//                while(no != this.raiz){
+//                    if(no.getPeso() > 1){
+//                        this.rotacionarParaDireita(no);
+//                    }
+ //                   if(no.getPeso() < -1){
+ //                       this.rotacionarParaEsquerda(no);
+ //                   }
+  //                  no = no.pai;
+ //               }
             }
             //Fim caso 2
             
             //Caso 3
             if(no.esquerdo != null && no.direito != null){
                 No<K, V> noRes = this.percorrerEsquerdo(no.direito);
-                //duvida, cria uma pilha de situacoes caso 3 em arvores muito grandes
                 if(noRes.direito != null){
                     noRes.direito.pai = noRes.pai;
                     noRes.pai.esquerdo = noRes.direito;
+                }else{
+                    noRes.pai.esquerdo = null;
                 }
                 no.setChave(noRes.getChave());
                 no.setValor(noRes.getValor());
-                return no;
             }
             //Fim caso 3
         }
@@ -153,17 +235,14 @@ import java.util.LinkedList;
         if(no.getChave().compareTo(chave) > 0){
             if(no.esquerdo != null){
             removerNoPriv(chave, no.esquerdo);
-            return no;
             }
         }
         //direito
         if(no.getChave().compareTo(chave) < 0){
             if(no.direito != null){
             removerNoPriv(chave, no.direito);
-            return no;
             }
         }
-        return null;
     }
     
     public No<K, V> percorrerEsquerdo(No<K, V> no){
@@ -173,9 +252,7 @@ import java.util.LinkedList;
         return no;
     }
     
-    public void listar(){
-        this.percorrerLargura();
-    }
+  
     
     public No<K, V> buscarNo(K chave){
          if(this.raiz == null){
@@ -210,7 +287,10 @@ import java.util.LinkedList;
         return this.tamanhoArvore;
     }
     
-    
+    public void listar(){
+        this.percorrerOrdem(this.raiz);
+    }
+      
     private void percorrerSimetrico(No<K, V> no){
         if(no != null){
             percorrerSimetrico(no.esquerdo);

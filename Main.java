@@ -21,13 +21,12 @@ public class Main {
         pessoas.inserir(1, "teste1");
         pessoas.inserir(4, "teste2");
         pessoas.inserir(5, "teste3");
+        pessoas.inserir(6, "teste");
+        pessoas.inserir(7, "teste");
+        pessoas.inserir(8, "teste");
         
         
         pessoas.listar();
-        //for (String elemento : arvore1) {
-        //    System.out.println(elemento);
-        //}
-        
     }
     
 }
